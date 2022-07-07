@@ -1,8 +1,10 @@
 package com.prograd.alok.Employee.Management.Controllers;
 
+import com.prograd.alok.Employee.Management.Exceptions.EmployeeNotFoundException;
 import com.prograd.alok.Employee.Management.Exceptions.IdMisMatchException;
 import com.prograd.alok.Employee.Management.Exceptions.OrganizationNotFoundException;
 import com.prograd.alok.Employee.Management.Models.Organization;
+import com.prograd.alok.Employee.Management.Models.Role;
 import com.prograd.alok.Employee.Management.Services.OrgService;
 
 import lombok.AllArgsConstructor;
@@ -66,7 +68,12 @@ public class OrgController {
 
     }
     @GetMapping("{id}")
-    public ResponseEntity<Organization> getOrganizationById(@PathVariable("id") Long emp_id){
-        return new ResponseEntity<Organization>(orgService.getOrganizationById(emp_id),HttpStatus.OK);
+    public ResponseEntity<?> getOrganizationById(@PathVariable("id") Long emp_id){
+        try{
+            return new ResponseEntity<Organization>(orgService.getOrganizationById(emp_id),HttpStatus.OK);
+        }catch (EmployeeNotFoundException e){
+            return new ResponseEntity<String>("Organization not found",HttpStatus.NOT_FOUND);
+        }
+
     }
 }

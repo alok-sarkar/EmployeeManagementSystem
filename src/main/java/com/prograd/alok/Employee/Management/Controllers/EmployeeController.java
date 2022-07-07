@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("api/employee/")
@@ -26,7 +27,17 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @PostMapping("new")
-    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee){
+    public ResponseEntity<?> saveEmployee(@RequestBody Employee employee){
+        if(employee.getEmail().isEmpty() || employee.getFirstName().isEmpty()|| employee.getLastName().isEmpty()||employee.getPassword().isEmpty()){
+            return new ResponseEntity<>("Please Fill the required fields: firstname,lastname,email,password",HttpStatus.FORBIDDEN);
+        }
+        String emailRegex = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        if(!pattern.matcher(employee.getEmail()).matches()){
+            return  new ResponseEntity<>("Invalid Email",HttpStatus.FORBIDDEN);
+        }
+        if(employee.getPassword().length()<8)
+            return new ResponseEntity<>("Password too short, it must have length of 8 or greater",HttpStatus.FORBIDDEN);
         return new ResponseEntity<Employee>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
     }
 
@@ -39,8 +50,11 @@ public class EmployeeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Employee verifiedEmployee;
         try {
-            if(authentication.getName().equals(employee.getEmail()) || authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR")))
+            if(authentication.getName().equals(employee.getEmail()) || authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR"))){
+                if(!authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR")))
+                    employee.setRoles(employeeService.getEmployeeById(employee.getEmp_id()).getRoles());
                 verifiedEmployee=employeeService.updateEmployee(employee,emp_id);
+            }
             else
                 return new ResponseEntity<String>("Unauthorized access Request ",HttpStatus.UNAUTHORIZED);
         } catch (IdMisMatchException e) {
@@ -67,7 +81,15 @@ public class EmployeeController {
 
     }
     @GetMapping("{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long emp_id){
-        return new ResponseEntity<Employee>(employeeService.getEmployeeById(emp_id),HttpStatus.OK);
+    public ResponseEntity<?> getEmployeeById(@PathVariable("id") Long emp_id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getName().equals(employeeService.getEmployeeById(emp_id).getEmail()) || authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR")) || authentication.getAuthorities().contains(new SimpleGrantedAuthority("Admin")))
+           try{
+               return new ResponseEntity<Employee>(employeeService.getEmployeeById(emp_id),HttpStatus.OK);
+           }catch (EmployeeNotFoundException e){
+               return new ResponseEntity<String>("Employee not found",HttpStatus.NOT_FOUND);
+           }
+        else
+            return new ResponseEntity<String>("Unauthorized access Request ",HttpStatus.UNAUTHORIZED);
     }
 }

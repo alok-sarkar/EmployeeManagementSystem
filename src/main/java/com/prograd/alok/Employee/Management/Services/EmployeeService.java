@@ -22,7 +22,7 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
 
-    public Employee getEmployeeById(Long emp_id){
+    public Employee getEmployeeById(Long emp_id) throws EmployeeNotFoundException{
         return employeeRepository.findById(emp_id).orElseThrow(()->new EmployeeNotFoundException(emp_id));
     }
 

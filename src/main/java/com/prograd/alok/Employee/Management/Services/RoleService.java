@@ -19,7 +19,7 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
-    public Role getRoleById(Long role_id){
+    public Role getRoleById(Long role_id) throws  RoleNotFoundException{
         return roleRepository.findById(role_id).orElseThrow(()->new RoleNotFoundException(role_id));
     }
     public Role updateRole(Role role, Long roleId) throws IdMisMatchException  {

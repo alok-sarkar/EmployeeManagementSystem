@@ -15,7 +15,7 @@ public class OrgService {
     public Organization saveOrganization(Organization organization){
         return organizationRepository.save(organization);
     }
-    public Organization getOrganizationById(Long organizationId){
+    public Organization getOrganizationById(Long organizationId) throws OrganizationNotFoundException{
         return organizationRepository.findById(organizationId).orElseThrow(()->new OrganizationNotFoundException(organizationId));
     }
     public Organization updateOrganization(Organization organization, Long organizationId) throws IdMisMatchException{

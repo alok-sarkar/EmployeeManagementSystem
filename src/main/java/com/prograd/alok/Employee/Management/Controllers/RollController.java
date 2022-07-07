@@ -1,7 +1,9 @@
 package com.prograd.alok.Employee.Management.Controllers;
 
+import com.prograd.alok.Employee.Management.Exceptions.EmployeeNotFoundException;
 import com.prograd.alok.Employee.Management.Exceptions.IdMisMatchException;
 import com.prograd.alok.Employee.Management.Exceptions.RoleNotFoundException;
+import com.prograd.alok.Employee.Management.Models.Employee;
 import com.prograd.alok.Employee.Management.Models.Role;
 import com.prograd.alok.Employee.Management.Services.RoleService;
 
@@ -25,40 +27,45 @@ public class RollController {
     RoleService roleService;
 
     @PostMapping("new")
-    public ResponseEntity<Role> saveRole(@RequestBody Role role){
-        return new ResponseEntity<Role>(roleService.saveRole(role), HttpStatus.CREATED);
+    public ResponseEntity<?> saveRole(@RequestBody Role role){
+        try{
+            roleService.getRoleById(role.getId());
+        }catch (RoleNotFoundException e){
+            return new ResponseEntity<Role>(roleService.saveRole(role), HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>("Role Already exists, try changing the id",HttpStatus.FORBIDDEN);
     }
     @GetMapping("all")
     public List<Role> getAllRoles(){
         return roleService.getAllRoles();
     }
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateRole(@RequestBody Role role, @PathVariable("id") Long emp_id){
+    public ResponseEntity<?> updateRole(@RequestBody Role role, @PathVariable("id") Long roleId){
         Role verifiedRole;
         try {
-            verifiedRole=roleService.updateRole(role,emp_id);
+            verifiedRole=roleService.updateRole(role,roleId);
         } catch (IdMisMatchException e) {
             return new ResponseEntity<String>(e.getMessage() ,HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<Role>(verifiedRole,HttpStatus.OK);
     }
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deleteRole(@PathVariable("id") Long emp_id ){
+    public ResponseEntity<String> deleteRole(@PathVariable("id") Long roleId ){
         Role role;
         try{
-            role=roleService.getRoleById(emp_id);
+            role=roleService.getRoleById(roleId);
         }catch (RoleNotFoundException e){
             return new ResponseEntity<String>("Role deletion Failed",HttpStatus.NOT_FOUND);
         }
     try{
-        roleService.deleteRole(emp_id);
+        roleService.deleteRole(roleId);
     }catch (DataIntegrityViolationException e){
         return new ResponseEntity<String>("Role deletion Failed due to integrity constraints",HttpStatus.FORBIDDEN);
     }
 
 
         try{
-            role=roleService.getRoleById(emp_id);
+            role=roleService.getRoleById(roleId);
         }catch (RoleNotFoundException e){
             return new ResponseEntity<String>("Role deleted Successfully",HttpStatus.OK);
         }
@@ -66,7 +73,12 @@ public class RollController {
 
     }
     @GetMapping("{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable("id") Long emp_id){
-        return new ResponseEntity<Role>(roleService.getRoleById(emp_id),HttpStatus.OK);
+    public ResponseEntity<?> getRoleById(@PathVariable("id") Long roleId){
+        try{
+            return new ResponseEntity<Role>(roleService.getRoleById(roleId),HttpStatus.OK);
+        }catch (EmployeeNotFoundException e){
+            return new ResponseEntity<String>("Role not found",HttpStatus.NOT_FOUND);
+        }
+
     }
 }
