@@ -62,8 +62,6 @@ public class RollController {
     }catch (DataIntegrityViolationException e){
         return new ResponseEntity<String>("Role deletion Failed due to integrity constraints",HttpStatus.FORBIDDEN);
     }
-
-
         try{
             role=roleService.getRoleById(roleId);
         }catch (RoleNotFoundException e){

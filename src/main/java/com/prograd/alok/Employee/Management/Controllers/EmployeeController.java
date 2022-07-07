@@ -7,6 +7,7 @@ import com.prograd.alok.Employee.Management.Services.EmployeeService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,13 @@ public class EmployeeController {
         }
         if(employee.getPassword().length()<8)
             return new ResponseEntity<>("Password too short, it must have length of 8 or greater",HttpStatus.FORBIDDEN);
-        return new ResponseEntity<Employee>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
+        Employee employee1;
+        try{
+            employee1=employeeService.saveEmployee(employee);
+        }catch (DataIntegrityViolationException e){
+            return new ResponseEntity<>("Email Already exists ",HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<Employee>(employee1, HttpStatus.CREATED);
     }
 
     @GetMapping("all")

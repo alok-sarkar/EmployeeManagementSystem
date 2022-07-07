@@ -7,6 +7,7 @@ import com.prograd.alok.Employee.Management.Models.Role;
 import com.prograd.alok.Employee.Management.Repositories.EmployeeRepository;
 import com.prograd.alok.Employee.Management.Repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,7 +19,12 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public Employee saveEmployee(Employee employee){
+        String encodedPassword = passwordEncoder.encode(employee.getPassword());
+        employee.setPassword(encodedPassword);
         return employeeRepository.save(employee);
     }
 
@@ -53,6 +59,7 @@ public class EmployeeService {
 //        }
 //            System.out.println(roleList);
             employee.setRoles(roleList);
+            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
             return employeeRepository.save(employee);
         }
         else
