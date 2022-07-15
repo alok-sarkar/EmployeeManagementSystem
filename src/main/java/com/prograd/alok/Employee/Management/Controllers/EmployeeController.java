@@ -29,8 +29,12 @@ public class EmployeeController {
 
     @PostMapping("new")
     public ResponseEntity<?> saveEmployee(@RequestBody Employee employee){
-        if(employee.getEmail().isEmpty() || employee.getFirstName().isEmpty()|| employee.getLastName().isEmpty()||employee.getPassword().isEmpty()){
+
+        if(employee.getEmail().isBlank() || employee.getFirstName().isBlank()|| employee.getLastName().isBlank()||employee.getPassword().isBlank()){
             return new ResponseEntity<>("Please Fill the required fields: firstname,lastname,email,password",HttpStatus.FORBIDDEN);
+        }
+        if (employee.getSalary()!=null && employee.getSalary()<0){
+            return new ResponseEntity<>("Salary cannot be negative",HttpStatus.FORBIDDEN);
         }
         String emailRegex = "^(.+)@(.+)$";
         Pattern pattern = Pattern.compile(emailRegex);
@@ -58,6 +62,9 @@ public class EmployeeController {
         Employee verifiedEmployee;
         try {
             if(authentication.getName().equals(employee.getEmail()) || authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR"))){
+                if (employee.getSalary()!=null && employee.getSalary()<0){
+                    return new ResponseEntity<>("Salary cannot be negative",HttpStatus.FORBIDDEN);
+                }
                 if(!authentication.getAuthorities().contains(new SimpleGrantedAuthority("HR")))
                     employee.setRoles(employeeService.getEmployeeById(employee.getEmp_id()).getRoles());
                 verifiedEmployee=employeeService.updateEmployee(employee,emp_id);

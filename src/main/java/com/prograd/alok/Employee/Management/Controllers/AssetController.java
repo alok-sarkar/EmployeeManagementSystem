@@ -64,7 +64,12 @@ public class AssetController {
 
     }
     @GetMapping("{id}")
-    public ResponseEntity<Asset> getAssetById(@PathVariable("id") Long emp_id){
-        return new ResponseEntity<Asset>(assetService.getAssetById(emp_id),HttpStatus.OK);
+    public ResponseEntity<?> getAssetById(@PathVariable("id") Long emp_id){
+        try{
+            return new ResponseEntity<Asset>(assetService.getAssetById(emp_id),HttpStatus.OK);
+        }catch (AssetNotFoundException e){
+            return new ResponseEntity<>("Asset not found ",HttpStatus.NOT_FOUND);
+        }
+
     }
 }

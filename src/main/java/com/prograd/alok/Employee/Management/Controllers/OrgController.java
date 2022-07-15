@@ -71,7 +71,7 @@ public class OrgController {
     public ResponseEntity<?> getOrganizationById(@PathVariable("id") Long emp_id){
         try{
             return new ResponseEntity<Organization>(orgService.getOrganizationById(emp_id),HttpStatus.OK);
-        }catch (EmployeeNotFoundException e){
+        }catch (OrganizationNotFoundException e){
             return new ResponseEntity<String>("Organization not found",HttpStatus.NOT_FOUND);
         }
 

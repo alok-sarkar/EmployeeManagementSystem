@@ -59,7 +59,7 @@ public class EmployeeService {
 //        }
 //            System.out.println(roleList);
             employee.setRoles(roleList);
-            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+//            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
             return employeeRepository.save(employee);
         }
         else

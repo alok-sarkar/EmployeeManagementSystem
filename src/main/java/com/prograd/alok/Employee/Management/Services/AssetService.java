@@ -15,7 +15,7 @@ public class AssetService {
     public Asset saveAsset(Asset asset){
         return assetRepository.save(asset);
     }
-    public Asset getAssetById(Long assetId){
+    public Asset getAssetById(Long assetId) throws  AssetNotFoundException{
         return assetRepository.findById(assetId).orElseThrow(()->new AssetNotFoundException(assetId));
     }
     public Asset updateAsset(Asset asset, Long assetId) throws IdMisMatchException{

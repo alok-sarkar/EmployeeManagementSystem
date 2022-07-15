@@ -7,9 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -26,15 +24,23 @@ public class Employee implements UserDetails {
     @Column(unique=true)
     private String email;
     private String password;
+    private Double salary;
     @ManyToMany(targetEntity = Role.class,fetch = FetchType.EAGER)
     private List<Role> roles= new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        //        List<GrantedAuthority> authorities=roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-//        List<GrantedAuthority> authorities=Arrays.stream(this.roles.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         return roles.stream().map((role)->new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
+
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
     }
 
     public String getEmail() {

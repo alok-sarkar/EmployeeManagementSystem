@@ -26,9 +26,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/api/roles/**").hasAnyAuthority("Admin")
                 .antMatchers("/api/**/new").hasAnyAuthority("HR")
                 .antMatchers("/api/**/delete/**").hasAnyAuthority("Admin")
+                .antMatchers("/api/assets/all").authenticated()
                 .antMatchers("/api/**/all").hasAnyAuthority("Admin","HR")
                 .antMatchers("/api/employee/update/**").authenticated()
                 .antMatchers("/api/**/update/**").hasAnyAuthority("HR")
+                .antMatchers("/api/org/{id}").hasAnyAuthority("Admin","HR")
+                .antMatchers("/api/roles/{id}").hasAnyAuthority("Admin","HR")
                 .antMatchers("/**").authenticated()
                 .anyRequest().authenticated().and().httpBasic().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
